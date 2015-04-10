@@ -1,0 +1,42 @@
+{
+   "urlConverters": [
+        {
+            "origin": "^http(?:s)?:\/\/github\.com\/(?!login|help|logout|signin|explore)([a-zA-Z0-9\-_]+)$",
+            "destination": "https://api.github.com/users/$1"
+        },
+        {
+            "origin": "^http(?:s)?:\/\/github\.com\/([a-zA-Z0-9\-_]+)\/([a-zA-Z0-9\-_]+)$",
+            "destination": "https://api.github.com/repos/$1/$2"
+        }
+   ],
+   "parsingRules": {
+        "^https:\/\/api\.github\.com\/users\/": [
+            {
+                "type": "json-pointer",
+                "content-types": ["application/json"],
+                "path": "/name",
+                "field": "title"
+            },
+            {
+
+            }
+        ],
+        "^https:\/\/api\.github\.com\/repos\/": [
+            {
+                "type": "json-pointer",
+                "content-types": ["application/json"],
+                "path": "/full_name",
+                "field": "title"
+            },
+            {
+
+            }
+        ]
+   },
+   "credentials": {
+
+   },
+   "postProcessors": [
+
+   ]
+}
