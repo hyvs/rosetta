@@ -1,7 +1,7 @@
 {
    "urlConverters": [
         {
-            "origin": "^http(?:s)?:\/\/github\.com\/(?!login|help|logout|signin|explore)([a-zA-Z0-9\-_]+)$",
+            "origin": "^http(?:s)?:\/\/github\.com\/([a-zA-Z0-9\-_]+)$",
             "destination": "https://api.github.com/users/$1"
         },
         {
@@ -18,10 +18,19 @@
                 "field": "title"
             },
             {
-
+                "type": "json-pointer",
+                "content-types": ["application/json"],
+                "path": "/avatar_url",
+                "field": "image"
+            },
+            {
+                "type": "json-pointer",
+                "content-types": ["application/json"],
+                "path": "/html_url",
+                "field": "url"
             }
         ],
-        "^https:\/\/api\.github\.com\/repos\/": [
+        "^https:\/\/api\.github\.com\/repos\/([a-zA-Z0-9\-_]+)\/([a-zA-Z0-9\-_]+)": [
             {
                 "type": "json-pointer",
                 "content-types": ["application/json"],
@@ -29,7 +38,16 @@
                 "field": "title"
             },
             {
-
+                "type": "json-pointer",
+                "content-types": ["application/json"],
+                "path": "/owner/avatar_url",
+                "field": "image"
+            },
+            {
+                "type": "json-pointer",
+                "content-types": ["application/json"],
+                "path": "/html_url",
+                "field": "url"
             }
         ]
    },
