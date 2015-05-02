@@ -26,6 +26,10 @@ type DomainConfig struct {
     parsingRules []ParsingRule
 }
 
+type UrlConfig struct {
+    parsingRules []ParsingRule
+}
+
 func init() {
 	flag.StringVar(&url, "url", "", "Requested URL")
 	flag.Parse()
@@ -59,9 +63,17 @@ func main() {
 	}
 	fmt.Printf("domainConfig: %v\n", domainConfig)
 
-    fmt.Printf("Converter for URL: %v", findConverter(url, domainConfig))
+    if converter := findConverter(url, domainConfig); converter != nil {
+        url = convertUrl(url, converter)
+        fmt.Println(url)
+        //@TODO: reload new DomainConfig for url
+    }
+
+    urlConfig := buildUrlConfig(url, &domainConfig)
+    fmt.Printf("%v\n", urlConfig.parsingRules)
 }
 
+// @TODO: a method of the UrlConverter struct ?
 func findConverter(url string, config DomainConfig) *UrlConverter {
    for _, converter := range config.converters {
         matched, err := regexp.MatchString(converter.origin, url)
@@ -69,6 +81,7 @@ func findConverter(url string, config DomainConfig) *UrlConverter {
             return &converter
         }
         if err != nil {
+            //@TODO: do something with err (log.error)
             fmt.Printf("err %v", err)
             return nil
         }
@@ -76,3 +89,29 @@ func findConverter(url string, config DomainConfig) *UrlConverter {
 
    return nil
 }
+
+// @TODO: a method of the UrlConverter struct ?
+func convertUrl(url string, converter *UrlConverter) string {
+    re := regexp.MustCompile(converter.origin);
+    return re.ReplaceAllString(url, converter.destination)
+}
+
+func buildUrlConfig(url string, domainConfig *DomainConfig) *UrlConfig {
+    rules := make([]ParsingRule, 0)
+    for _, rule := range domainConfig.parsingRules {
+        fmt.Printf("%s\n", rule.urlPattern)
+        matched, err := regexp.MatchString(rule.urlPattern, url)
+        if matched {
+            rules = append(rules, rule)
+        }
+        if err != nil {
+            //@TODO: do something with err (log.error)
+            fmt.Printf("err %v", err)
+            return nil
+        }
+    }
+
+    urlConfig := &UrlConfig{rules}
+    return urlConfig
+}
+
