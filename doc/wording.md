@@ -30,6 +30,7 @@ Peut être de type :
 - CSS path
 - open graph
 - html meta
+- embedded
 
 Contient la logique d'extraction des infos.
 
@@ -42,7 +43,7 @@ Renvoie une structure open graph.
 
 Les informations retournées en output. Respecte [le protocole OpenGraph](ogp.me)
 
-### Url converter (router ?)
+### Rewriter
 
 Prend en entrée une URL public (site web) et peut la traduire en une URL alternative mieux adaptée à la récupération de données. Exemples : url d'API, url oembed, ...
 
