@@ -1,0 +1,40 @@
+{
+   "urlConverters": [],
+   "parsingRules": {
+        ".*": [
+            {
+                "type": "css-path",
+                "content-types": ["text/html", "application/xhtml+xml"],
+                "path": "head > meta[property='og:title']",
+                "field": "title"
+            },
+            {
+                "type": "css-path",
+                "content-types": ["text/html", "application/xhtml+xml"],
+                "path": "head > title",
+                "field": "title"
+            },
+            {
+                "type": "css-path",
+                "content-types": ["text/html", "application/xhtml+xml"],
+                "path": "h1",
+                "field": "title"
+            },
+            {
+                "type": "css-path",
+                "content-types": ["text/html", "application/xhtml+xml"],
+                "path": "head > meta[property='og:image']",
+                "field": "image"
+            },
+            {
+                "type": "html-images",
+                "content-types": ["text/html", "application/xhtml+xml"],
+                "path": "body > img",
+                "field": "image"
+            }
+        ]
+   },
+   "credentials": {},
+   "postProcessors": []
+}
+
