@@ -66,7 +66,7 @@ func main() {
 		return
 	}
 	//@TODO retrieve response headers.
-	// defer resp.Body.Close()
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Printf("%v\n", err)
