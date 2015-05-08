@@ -1,12 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
+
+	jsonpointer "github.com/mattn/go-jsonpointer"
 )
+
+// TODO:
+// rename converter -> rewriter
 
 var url string
 
@@ -59,16 +65,38 @@ func main() {
 		fmt.Printf("%v\n", err)
 		return
 	}
-	//@TODO: apply parsing rules
+	//@TODO retrieve response headers.
 	// defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return
 	}
-	fmt.Print(body)
-	//@TODO: return OG-like structure
+	fmt.Printf("%s\n", body)
 
+	// parse unknow json
+	var f interface{}
+	err = json.Unmarshal(body, &f)
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		return
+	}
+	fmt.Printf("%T\n", f)
+	//@TODO: apply parsing rules
+	for _, r := range urlConfig.parsingRules {
+		if err != nil {
+			fmt.Printf("%v\n", err)
+			return
+		}
+		fmt.Printf("rule : %v\n", r)
+		field, err := jsonpointer.Get(f, r.path)
+		if err != nil {
+			fmt.Printf("%v\n", err)
+			return
+		}
+		fmt.Printf("field value : %v\n", field)
+	}
+	//@TODO: return OG-like structure
 }
 
 // @TODO: a method of the UrlConverter struct ?
@@ -124,14 +152,21 @@ func mockGithubConfig() DomainConfig {
 	fmt.Printf("my urlConverters: %v\n", converters)
 
 	rules := make([]ParsingRule, 0)
-	rule := ParsingRule{
+	ruleName := ParsingRule{
 		"^https:\\/\\/api\\.github\\.com\\/users\\/",
 		"json-pointer",
 		[]string{"application/json"},
 		"/name",
 		"title",
 	}
-	rules = append(rules, rule)
+	ruleThumb := ParsingRule{
+		"^https:\\/\\/api\\.github\\.com\\/users\\/",
+		"json-pointer",
+		[]string{"application/json"},
+		"/avatar_url",
+		"thumbs",
+	}
+	rules = append(rules, ruleName, ruleThumb)
 
 	domainConfig := DomainConfig{
 		converters,
