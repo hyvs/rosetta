@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"regexp"
 
-	jsonpointer "github.com/mattn/go-jsonpointer"
+	"github.com/andybalholm/cascadia"
+	"github.com/mattn/go-jsonpointer"
+	"golang.org/x/net/html"
 )
 
 // TODO:
@@ -46,6 +48,31 @@ func init() {
 }
 
 func main() {
+	url := "http://www.lemonde.fr/europe/article/2015/03/26/le-point-sur-le-verrouillage-de-la-porte-du-cockpit_4602066_3214.html"
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return
+	}
+	defer res.Body.Close()
+
+	// Parse the HTML into nodes
+	root, err := html.Parse(res.Body)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return
+	}
+
+	selector, err := cascadia.Compile("meta[property='og:title']")
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return
+	}
+
+	node := selector.MatchFirst(root)
+	fmt.Printf("%v\n", node)
+
+	return
 	fmt.Println("URL is ", url)
 
 	domainConfig := mockGithubConfig()
