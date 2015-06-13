@@ -21,7 +21,8 @@ func init() {
 }
 
 func main() {
-	url := "http://www.lemonde.fr/europe/article/2015/03/26/le-point-sur-le-verrouillage-de-la-porte-du-cockpit_4602066_3214.html"
+	//url := "http://www.lemonde.fr/europe/article/2015/03/26/le-point-sur-le-verrouillage-de-la-porte-du-cockpit_4602066_3214.html"
+	url := "https://github.com/hyvs"
 	res, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("%v\n", err)
@@ -45,13 +46,12 @@ func main() {
 	node := selector.MatchFirst(root)
 	fmt.Printf("%v\n", node)
 
-	return
 	fmt.Println("URL is ", url)
 
 	domainConfig := mockGithubConfig()
 
 	if rewriter := findRewriter(url, domainConfig); rewriter != nil {
-		url = rewriteUrl(url, rewriter)
+		url = rewriter.Rewrite(url)
 		fmt.Println(url)
 		domainConfig = mockGithubConfig()
 	}
@@ -113,12 +113,6 @@ func findRewriter(url string, config DomainConfig) *UrlRewriter {
 	}
 
 	return nil
-}
-
-// @TODO: a method of the UrlRewriter struct ?
-func rewriteUrl(url string, rewriter *UrlRewriter) string {
-	re := regexp.MustCompile(rewriter.OriginPattern)
-	return re.ReplaceAllString(url, rewriter.DestinationPattern)
 }
 
 func buildUrlConfig(url string, domainConfig *DomainConfig) *UrlConfig {

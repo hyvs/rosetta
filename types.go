@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"regexp"
+)
 
 type Config []DomainConfig
 
@@ -41,8 +44,9 @@ type UrlRewriter struct {
 	DestinationPattern string
 }
 
-func (UrlRewriter) Rewrite(url string) string {
-	return "mock-url"
+func (r UrlRewriter) Rewrite(url string) string {
+	re := regexp.MustCompile(r.OriginPattern)
+	return re.ReplaceAllString(url, r.DestinationPattern)
 }
 
 type UrlMatcher interface {
