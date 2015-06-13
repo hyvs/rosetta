@@ -1,5 +1,7 @@
 package main
 
+import "net/http"
+
 type Config []DomainConfig
 
 // config for domain (converters, parsing rules, credentials, etc.)
@@ -11,11 +13,6 @@ type DomainConfig struct {
 // config for input URL ; parsing rules here are a filtered subset of domain's parsing rules
 type UrlConfig struct {
 	parsingRules []ParsingRule
-}
-
-type Request struct {
-	credentials string
-	url         string
 }
 
 type Request struct {
@@ -39,10 +36,13 @@ type DomainMatcher interface {
 	Match(c *Config, url string) *DomainConfig
 }
 
-type UrlRewriter interface {
-	//	patternOrigin string
-	//	patternDestination string
-	Rewrite(url string) (url string)
+type UrlRewriter struct {
+	OriginPattern      string
+	DestinationPattern string
+}
+
+func (UrlRewriter) Rewrite(url string) string {
+	return "mock-url"
 }
 
 type UrlMatcher interface {
@@ -50,9 +50,9 @@ type UrlMatcher interface {
 }
 
 type Requester interface {
-	Get(c *Request) *http.response
+	Get(c *Request) *http.Response
 }
 
 type Redirecter interface {
-	Redirect(r *http.response) (url string)
+	Redirect(r *http.Response) (url string)
 }

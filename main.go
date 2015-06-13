@@ -13,34 +13,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-// TODO:
-// rename converter -> rewriter
-
 var url string
-
-type UrlConverter struct {
-	origin      string
-	destination string
-}
-
-type ParsingRule struct {
-	urlPattern   string
-	ruleType     string
-	contentTypes []string
-	path         string
-	field        string
-}
-
-// config for domain (converters, parsing rules, credentials, etc.)
-type DomainConfig struct {
-	converters   []UrlConverter
-	parsingRules []ParsingRule
-}
-
-// config for input URL ; parsing rules here are a filtered subset of domain's parsing rules
-type UrlConfig struct {
-	parsingRules []ParsingRule
-}
 
 func init() {
 	flag.StringVar(&url, "url", "", "Requested URL")
@@ -77,8 +50,8 @@ func main() {
 
 	domainConfig := mockGithubConfig()
 
-	if converter := findConverter(url, domainConfig); converter != nil {
-		url = convertUrl(url, converter)
+	if rewriter := findRewriter(url, domainConfig); rewriter != nil {
+		url = rewriteUrl(url, rewriter)
 		fmt.Println(url)
 		domainConfig = mockGithubConfig()
 	}
@@ -126,12 +99,11 @@ func main() {
 	//@TODO: return OG-like structure
 }
 
-// @TODO: a method of the UrlConverter struct ?
-func findConverter(url string, config DomainConfig) *UrlConverter {
-	for _, converter := range config.converters {
-		matched, err := regexp.MatchString(converter.origin, url)
+func findRewriter(url string, config DomainConfig) *UrlRewriter {
+	for _, rewriter := range config.rewriters {
+		matched, err := regexp.MatchString(rewriter.OriginPattern, url)
 		if matched {
-			return &converter
+			return &rewriter
 		}
 		if err != nil {
 			//@TODO: do something with err (log.error)
@@ -143,10 +115,10 @@ func findConverter(url string, config DomainConfig) *UrlConverter {
 	return nil
 }
 
-// @TODO: a method of the UrlConverter struct ?
-func convertUrl(url string, converter *UrlConverter) string {
-	re := regexp.MustCompile(converter.origin)
-	return re.ReplaceAllString(url, converter.destination)
+// @TODO: a method of the UrlRewriter struct ?
+func rewriteUrl(url string, rewriter *UrlRewriter) string {
+	re := regexp.MustCompile(rewriter.OriginPattern)
+	return re.ReplaceAllString(url, rewriter.DestinationPattern)
 }
 
 func buildUrlConfig(url string, domainConfig *DomainConfig) *UrlConfig {
@@ -169,14 +141,14 @@ func buildUrlConfig(url string, domainConfig *DomainConfig) *UrlConfig {
 }
 
 func mockGithubConfig() DomainConfig {
-	urlConverter := UrlConverter{
+	urlRewriter := UrlRewriter{
 		"^http(?:s)?:\\/\\/github\\.com\\/([a-zA-Z0-9\\-_]+)$",
 		"https://api.github.com/users/$1",
 	}
-	fmt.Printf("my urlConverter: %v\n", urlConverter)
-	converters := make([]UrlConverter, 0, 2)
-	converters = append(converters, urlConverter)
-	fmt.Printf("my urlConverters: %v\n", converters)
+	fmt.Printf("my urlConverter: %v\n", urlRewriter)
+	rewriters := make([]UrlRewriter, 0, 2)
+	rewriters = append(rewriters, urlRewriter)
+	fmt.Printf("my urlConverters: %v\n", rewriters)
 
 	rules := make([]ParsingRule, 0)
 	ruleName := ParsingRule{
@@ -196,7 +168,7 @@ func mockGithubConfig() DomainConfig {
 	rules = append(rules, ruleName, ruleThumb)
 
 	domainConfig := DomainConfig{
-		converters,
+		rewriters,
 		rules,
 	}
 	fmt.Printf("domainConfig: %v\n", domainConfig)
