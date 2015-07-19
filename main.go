@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/andybalholm/cascadia"
-	"github.com/mattn/go-jsonpointer"
-	"golang.org/x/net/html"
+	"github.com/hyvs/rosetta/Godeps/_workspace/src/github.com/andybalholm/cascadia"
+	"github.com/hyvs/rosetta/Godeps/_workspace/src/github.com/mattn/go-jsonpointer"
+	"github.com/hyvs/rosetta/Godeps/_workspace/src/golang.org/x/net/html"
 )
 
 var url string

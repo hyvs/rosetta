@@ -1,0 +1,22 @@
+{
+	"ImportPath": "github.com/hyvs/rosetta",
+	"GoVersion": "go1.4",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/andybalholm/cascadia",
+			"Rev": "54abbbf07a45a3ef346ebe903e0715d9a3c19352"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-jsonpointer",
+			"Rev": "d13edc9bbc2fefbae309d00e59abe4c30cf73faf"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Comment": "null-219",
+			"Rev": "e56a6fa23065dd8cede702d2ffb090c2c1999b28"
+		}
+	]
+}
