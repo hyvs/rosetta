@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"regexp"
 
 	"github.com/hyvs/rosetta/Godeps/_workspace/src/github.com/andybalholm/cascadia"
@@ -15,14 +16,32 @@ import (
 
 var url string
 
-func init() {
-	flag.StringVar(&url, "url", "", "Requested URL")
-	flag.Parse()
+func determineListenAddress() (string, error) {
+	port := os.Getenv("PORT")
+	if port == "" {
+		return "", fmt.Errorf("$PORT not set")
+	}
+	return ":" + port, nil
 }
 
 func main() {
+	addr, err := determineListenAddress()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	http.HandleFunc("/", rosetta)
+	log.Printf("Listening on %s...\n", addr)
+	if err := http.ListenAndServe(addr, nil); err != nil {
+		panic(err)
+	}
+}
+
+func rosetta(w http.ResponseWriter, r *http.Request) {
 	//url := "http://www.lemonde.fr/europe/article/2015/03/26/le-point-sur-le-verrouillage-de-la-porte-du-cockpit_4602066_3214.html"
-	url := "https://github.com/hyvs"
+	//url := "https://github.com/hyvs"
+	url := r.FormValue("url")
+
 	res, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("%v\n", err)
